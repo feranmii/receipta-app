@@ -1,7 +1,8 @@
 
 class Pages
 {
-  String NewExpense = "/newExpense";
-  String Home = "/home";
+  String get home =>  "/";
+  String get createExpense =>  "/createExpense";
+
 
 }
