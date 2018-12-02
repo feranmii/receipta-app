@@ -1,13 +1,104 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+
+import 'package:path_provider/path_provider.dart';
+
+class CreateExpense extends StatefulWidget {
+  @override
+  CreateExpenseState createState() {
+    return new CreateExpenseState();
+  }
+}
+
+class CreateExpenseState extends State<CreateExpense> {
+  TextEditingController merchantController;
+  TextEditingController totalController;
+
+  File jsonFile;
+  Directory dir;
+  String filename = "expenses.json";
+  bool fileExists = false;
+  Map<String, dynamic> fileContent;
+
+  @override
+  void dispose()
+  {
+    merchantController.dispose();
+    totalController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState()
+  {
+    super.initState();
+    getApplicationDocumentsDirectory().then((Directory directory)
+    {
+      dir = directory;
+      jsonFile  = new File(dir.path + "/" + filename);
+      fileExists = jsonFile.existsSync();
+      if(fileExists)
+      {
+        this.setState(() => fileContent = json.decode(jsonFile.readAsStringSync()));
+      }
+    });
+  }
 
 
-import 'package:intl/intl.dart';class CreateExpense extends StatelessWidget {
+  void createFile(Map<String, String> content, Directory dir, String filename)
+  {
+    print("Create file");
+    File file = new File(dir.path + "/" + filename);
+    file.createSync();
+    fileExists = true;
+    file.writeAsStringSync(json.encode(content));
+
+  }
+
+  void writeToFile(String key, String value)
+  {
+    print("Write to file");
+    Map<String, String> content = {key: value};
+    if(fileExists)
+    {
+      print("Fiile already exists");
+      Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
+      jsonFileContent.addAll(content);
+      jsonFile.writeAsStringSync(json.encode(jsonFileContent));
+    }
+    else
+    {
+      print("File does not exist");
+      createFile(content, dir,  filename);
+    }
+
+    setState(() {
+      fileContent = json.decode(jsonFile.readAsStringSync());
+      print(fileContent);
+    });
+
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("New Expense"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(
+              "Save"
+            ),
+
+            onPressed: () => writeToFile(merchantController.text, totalController.text),
+
+
+          )
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
@@ -18,7 +109,17 @@ import 'package:intl/intl.dart';class CreateExpense extends StatelessWidget {
             color: Colors.white,
             child: Column(
               children: <Widget>[
-                createExpenseCard(),
+               // createExpenseCard(),
+                  Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: Column(
+                      children: <Widget>[
+                        //Top Row With User Info and payment type
+                        expenseInfo(),
+                        expForm(merchantController,  totalController, fileContent),
+                      ],
+                    ),
+                  ),
                 //expenseForm(),
               ],
             ),
@@ -36,7 +137,7 @@ Widget createExpenseCard() {
       children: <Widget>[
         //Top Row With User Info and payment type
         expenseInfo(),
-        expForm(),
+        //expForm(merchantController,  totalController),
       ],
     ),
   );
@@ -86,118 +187,101 @@ Widget expenseInfo() {
   );
 }
 
-Widget expenseForm() {
-  final dateFormat = DateFormat("EEEE, MMMM d, yyyy 'at' h:mma");
 
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Column(
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-        Text(
-          "Merchant",
-          style: TextStyle(
-            color: Colors.black54,
-          ),
-        ),
-        Row(
-          children: <Widget>[
-            Container(
-              width: 260.0,
-              padding: EdgeInsets.all(5.0),
-              child: TextField(
-
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16.0
-
-                ),
-
-                decoration: new InputDecoration(
-                  enabledBorder: const UnderlineInputBorder(
-                    // width: 0.0 produces a thin "hairline" border
-                    borderSide:
-                        const BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              height: 60.0,
-              width: 50.0,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(2.0),
-                  color: Colors.grey[100]),
-              child: Icon(
-                Icons.assignment,
-                color: Colors.teal[100],
-                size: 35.0,
-              ),
-            )
-          ],
-        ),
-
-        DateTimePickerFormField(
-          format: dateFormat,
-          style: TextStyle(
-            color: Colors.black54
-          ),
-          decoration: InputDecoration(labelText: "Data", labelStyle: TextStyle(
-            color: Colors.black54
-          )),
-
-        ),
-
-        Text(
-          "Date",
-          style: TextStyle(
-            color: Colors.black54,
-          ),
-        ),
-        //Second Row
-        Row(
-          children: <Widget>[
-            Container(
-              width: 260.0,
-              padding: EdgeInsets.all(5.0),
-              child: TextField(
-                style: TextStyle(
-                    color: Colors.black
-                ),
-
-                decoration: new InputDecoration(
-                  enabledBorder: const UnderlineInputBorder(
-                    // width: 0.0 produces a thin "hairline" border
-                    borderSide:
-                    const BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        )
-
-
-      ],
-    ),
-  );
-}
-
-Widget expForm()
+Widget expForm(TextEditingController mc, TextEditingController tc, Map<String, dynamic> fc)
 {
   return Form(
    // padding: const EdgeInsets.symmetric(horizontal: 16.0),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
       children: <Widget>[
-        new TextFormField(
+         TextFormField(
+           controller: mc,
           decoration: const InputDecoration(
-            hintText: 'Enter your first and last name',
+            icon: Icon(
+              Icons.store
+            ),
+            hintText: 'Enter Merchant Name',
             labelText: 'Merchant',
           ),
 
           validator: (val) => val.isEmpty ? 'Name is required' : null,
          // onSaved: (val) => newContact.name = val,
         ),
+
+         new Row(children: <Widget>[
+           new Expanded(
+               child: new TextFormField(
+                 decoration: new InputDecoration(
+                   icon: const Icon(Icons.calendar_today),
+                  // hintText: 'Enter your date of birth',
+                   labelText: 'Date',
+                 ),
+                 //controller: _controller,
+                 keyboardType: TextInputType.datetime,
+                 //validator: (val) =>
+              //   isValidDob(val) ? null : 'Not a valid date',
+               //  onSaved: (val) => newContact.dob = convertToDate(val),
+               ),
+           ),
+           new IconButton(
+             icon: new Icon(Icons.more_horiz),
+             tooltip: 'Choose date',
+             onPressed: (() {
+           //    _chooseDate(context, _controller.text);
+             }),
+           )
+         ]),
+
+         Row(
+
+           children: <Widget>[
+
+             Expanded(
+               flex: 1,
+               child: TextFormField(
+                 decoration: InputDecoration(
+                   hintText: "NGN",
+                   icon: Icon(
+                       Icons.attach_money
+                   ),
+                 ),
+               ),
+             ),
+
+             Expanded(
+               flex: 3,
+               child: TextFormField(
+                 controller: mc,
+
+                 decoration: InputDecoration(
+                   icon: Icon(
+                     Icons.note
+                   ),
+                   hintText: "N0.00",
+                 ),
+               ),
+             )
+           ],
+         ),
+
+         TextFormField(
+           decoration: InputDecoration(
+             icon: Icon(
+                 Icons.comment
+             ),
+             hintText: "Comment",
+           ),
+         ),
+
+
+        Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Text(
+            fc.toString()
+          ),
+        )
      ],
     ),
   );
