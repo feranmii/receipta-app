@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         p.createExpense : (BuildContext context) => CreateExpense(),
       },
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
+      theme: ThemeData.light(),
       //home: HomePage(),
     );
   }

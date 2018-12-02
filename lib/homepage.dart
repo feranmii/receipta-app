@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'firstPage.dart';
 import 'secondPage.dart';
 import 'thirdPage.dart';
+import 'routes.dart';
 
 class DrawerItem{
   String title;
@@ -85,6 +86,7 @@ class _HomePageState extends State<HomePage> {
         //here we display the corresponding fragment
         //we can instead choose to have a static title
         title: Text(widget.navDetails[selectedIndex].title),
+
         //centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -120,6 +122,8 @@ class _HomePageState extends State<HomePage> {
 
 void newTaskModalBottomSheet(context)
 {
+  var p  = Pages();
+
   showModalBottomSheet(
     context: context,
     builder: (BuildContext bc)
@@ -141,7 +145,9 @@ void newTaskModalBottomSheet(context)
               ListTile(
                 leading: Icon(Icons.create, color: Colors.teal,),
                 title: Text("Manually Create"),
-                onTap: ()=> {},
+
+                onTap: ()=> Navigator.pushNamed(context, p.createExpense),
+
               ),
               ListTile(
                 leading: Icon(Icons.scanner, color: Colors.teal,),
