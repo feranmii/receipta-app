@@ -21,6 +21,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   datetime_picker_formfield:
   path_provider:
+  intl: ^0.15.7
 
 dev_dependencies:
   flutter_test:
@@ -40,7 +41,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - jsons/expenses.json
+     - jsons/exp.json
 
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg

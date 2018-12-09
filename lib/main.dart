@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   var p = Pages();
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Receipta!",
+      title: "Receipta",
 
       initialRoute: p.createExpense,
       routes:<String, WidgetBuilder> {
