@@ -1,57 +1,41 @@
+
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'expense.dart';
+import 'package:flutter/services.dart';
 
+Future<String> _loadexpensesAsset() async {
+  return await rootBundle.loadString('jsons/expenses.json');
+}
+Future loadexpenses() async
+{
+  String jsonExpenses = await _loadexpensesAsset();
+  //print(jsonExpenses);
+  Expense expense = _parseJsonForExpenses(jsonExpenses);
 
-class ExpenseJson{
-  File jsonFile;
-  Directory dir;
-  String filename = "expenses.json";
-  bool fileExists = false;
-  Map<String, dynamic> fileContent;
+  //print(expense.merchant);
 
-  void initialize()
-  {
-    getApplicationDocumentsDirectory().then((Directory directory)
-    {
-      dir = directory;
-      jsonFile = new File(dir.path + "/" + filename);
-      fileExists = jsonFile.existsSync();
-//      if(fileExists)
-//        {
-//
-//        }
-    });
-  }
+}
 
-  void createFile(Map<String, String> content, Directory dir, String filename)
-  {
-    print("Create File");
-    File file  =new File(dir.path + "/" + filename);
-    file.createSync();
-    fileExists = true;
-    file.writeAsStringSync(json.encode(content));
-  }
+Expense _parseJsonForExpenses(String jsonString)
+{
+  Map decoded = jsonDecode(jsonString);
 
-  void writeToFile(String key, String value)
-  {
-    print("Write to File");
-    Map<String, String> content = {key: value};
-    if(fileExists)
-      {
-        print("File already exists");
-        Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
-        jsonFileContent.addAll(content);
-        jsonFile.writeAsStringSync(json.encode(jsonFileContent));
+  List<CashDetail> cash = new List<CashDetail>();
+  print(decoded["cart 1"]['name']);
+//  for (var exp in decoded['expenses']) {
+//    cash.add(new CashDetail(exp['amount'], exp['currency']));
+//  }
 
-      }
-      else
-        {
-          print("File does not exist");
-          createFile(content, dir, filename);
+  return new Expense(decoded['cart 1']['id'], decoded['cart 2']['name'], new ExpenseDetail(cash));
+}
 
-        }
+Expense _parseExpensesToJson(String jsonString, String key, String value)
+{
+  Map decoded = jsonDecode(jsonString);
+  var expense = {"casas": "dsd"};
 
-
-  }
+  var user = json.encode(expense);
+  Map<String, String>content= {key: value};
+  //var data = json.encode();
 }

@@ -1,9 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-
-import 'package:path_provider/path_provider.dart';
 
 class CreateExpense extends StatefulWidget {
   @override
@@ -13,75 +8,6 @@ class CreateExpense extends StatefulWidget {
 }
 
 class CreateExpenseState extends State<CreateExpense> {
-  TextEditingController merchantController;
-  TextEditingController totalController;
-
-  File jsonFile;
-  Directory dir;
-  String filename = "expenses.json";
-  bool fileExists = false;
-  Map<String, dynamic> fileContent;
-
-  @override
-  void dispose()
-  {
-    merchantController.dispose();
-    totalController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState()
-  {
-    super.initState();
-    getApplicationDocumentsDirectory().then((Directory directory)
-    {
-      dir = directory;
-      jsonFile  = new File(dir.path + "/" + filename);
-      fileExists = jsonFile.existsSync();
-      if(fileExists)
-      {
-        this.setState(() => fileContent = json.decode(jsonFile.readAsStringSync()));
-      }
-    });
-  }
-
-
-  void createFile(Map<String, String> content, Directory dir, String filename)
-  {
-    print("Create file");
-    File file = new File(dir.path + "/" + filename);
-    file.createSync();
-    fileExists = true;
-    file.writeAsStringSync(json.encode(content));
-
-  }
-
-  void writeToFile(String key, String value)
-  {
-    print("Write to file");
-    Map<String, String> content = {key: value};
-    if(fileExists)
-    {
-      print("Fiile already exists");
-      Map<String, dynamic> jsonFileContent = json.decode(jsonFile.readAsStringSync());
-      jsonFileContent.addAll(content);
-      jsonFile.writeAsStringSync(json.encode(jsonFileContent));
-    }
-    else
-    {
-      print("File does not exist");
-      createFile(content, dir,  filename);
-    }
-
-    setState(() {
-      fileContent = json.decode(jsonFile.readAsStringSync());
-      print(fileContent);
-    });
-
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +20,6 @@ class CreateExpenseState extends State<CreateExpense> {
               "Save"
             ),
 
-            onPressed: () => writeToFile(merchantController.text, totalController.text),
 
 
           )
@@ -105,24 +30,39 @@ class CreateExpenseState extends State<CreateExpense> {
         child: Container(
           height: MediaQuery.of(context).size.height / 1.8,
           width: MediaQuery.of(context).size.width,
-          child: Card(
-            color: Colors.white,
-            child: Column(
-              children: <Widget>[
-               // createExpenseCard(),
-                  Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      children: <Widget>[
-                        //Top Row With User Info and payment type
-                        expenseInfo(),
-                        expForm(merchantController,  totalController, fileContent),
-                      ],
-                    ),
-                  ),
-                //expenseForm(),
-              ],
-            ),
+
+          child: Column(
+            children: <Widget>[
+
+              Card(
+                color: Colors.white,
+                child: Column(
+                  children: <Widget>[
+                   // createExpenseCard(),
+                      Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Column(
+                          children: <Widget>[
+                            //Top Row With User Info and payment type
+                            expenseInfo(),
+                            //expForm(merchantController,  totalController, fileContent),
+
+                            Text(
+                              "Wowo"
+                            ),
+
+                            Text(
+                              "Wowowwwww"
+                            )
+
+                          ],
+                        ),
+                      ),
+                    //expenseForm(),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -190,6 +130,7 @@ Widget expenseInfo() {
 
 Widget expForm(TextEditingController mc, TextEditingController tc, Map<String, dynamic> fc)
 {
+  print(mc);
   return Form(
    // padding: const EdgeInsets.symmetric(horizontal: 16.0),
     child: Column(
@@ -266,13 +207,14 @@ Widget expForm(TextEditingController mc, TextEditingController tc, Map<String, d
            ],
          ),
 
-         TextFormField(
+         TextField(
            decoration: InputDecoration(
              icon: Icon(
                  Icons.comment
              ),
              hintText: "Comment",
            ),
+           controller: tc,
          ),
 
 
